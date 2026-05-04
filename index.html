@@ -2,695 +2,615 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Parashut">
-<meta name="theme-color" content="#f5f4f0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Parashut</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
-:root{--bg:#f5f4f0;--surface:#fff;--text:#1a1a18;--muted:#8a8a85;--line:#e8e8e2;--done:#c8c8c2;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-.screen{display:none;max-width:560px;margin:0 auto;padding:48px 24px 80px;}
-.screen.active{display:block;}
-.ob-logo{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-.ob-title{font-family:'DM Mono',monospace;font-size:32px;font-weight:300;letter-spacing:-.02em;margin-bottom:32px;}
-.ob-desc{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:36px;}
-.node-box{display:flex;align-items:baseline;gap:8px;margin-bottom:40px;padding:20px 24px;border:1px solid var(--line);background:var(--surface);}
-.node-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
-.node-num{font-family:'DM Mono',monospace;font-size:44px;font-weight:300;letter-spacing:-.04em;}
-.f-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-.f-inp{width:100%;background:var(--surface);border:1px solid var(--line);padding:12px 14px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);outline:none;margin-bottom:20px;transition:border-color .2s;}
-.f-inp:focus{border-color:var(--text);}
-.f-inp::placeholder{color:var(--done);}
-.btn-reg{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--surface);background:var(--text);border:none;padding:14px;cursor:pointer;width:100%;transition:opacity .2s;}
-.btn-reg:hover{opacity:.8;}
-.btn-reg:disabled{opacity:.4;cursor:not-allowed;}
-.ob-err{font-family:'DM Mono',monospace;font-size:10px;color:#c0392b;margin-top:10px;min-height:14px;}
-.hdr{margin-bottom:40px;}
-.hdr-top{display:flex;justify-content:space-between;align-items:flex-start;}
-.logo{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
-.date-txt{font-family:'DM Mono',monospace;font-size:26px;font-weight:300;letter-spacing:-.02em;}
-.nbadge{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:right;}
-.nbadge strong{color:var(--text);font-weight:400;}
-.prog-row{display:flex;align-items:center;gap:12px;margin-top:14px;}
-.prog-track{flex:1;height:1px;background:var(--line);position:relative;}
-.prog-fill{position:absolute;left:0;top:0;height:100%;background:var(--text);transition:width .4s;}
-.prog-pct{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-width:32px;text-align:right;}
-.nav{display:flex;margin-bottom:36px;border-bottom:1px solid var(--line);}
-.nav-btn{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:none;border:none;padding:12px 0;margin-right:24px;cursor:pointer;position:relative;transition:color .2s;}
-.nav-btn.active{color:var(--text);}
-.nav-btn.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:var(--text);}
-.view{display:none;}
-.view.active{display:block;}
-.sec-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:28px 0 10px;}
-.sec-lbl:first-child{margin-top:0;}
-.task{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);transition:opacity .2s;}
-.task.done{opacity:.35;}
-.task-chk{width:15px;height:15px;border:1px solid var(--done);flex-shrink:0;margin-top:2px;position:relative;cursor:pointer;transition:all .2s;}
-.task:hover .task-chk{border-color:var(--text);}
-.task.done .task-chk{background:var(--text);border-color:var(--text);}
-.task.done .task-chk::after{content:'';position:absolute;left:2px;top:1px;width:8px;height:4px;border-left:1px solid #fff;border-bottom:1px solid #fff;transform:rotate(-45deg);}
-.task-body{flex:1;min-width:0;}
-.task-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:2px;}
-.task-title{font-size:14px;line-height:1.4;word-break:break-word;}
-.task.done .task-title{text-decoration:line-through;color:var(--muted);}
-.task-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--done);margin-top:3px;}
-.task-del{font-size:16px;color:var(--done);background:none;border:none;cursor:pointer;padding:0 4px;flex-shrink:0;align-self:center;transition:color .2s;}
-.task-del:hover{color:#c0392b;}
-.add-row{display:flex;gap:8px;margin-top:24px;padding-top:24px;border-top:1px solid var(--line);}
-.add-inp{flex:1;background:var(--surface);border:1px solid var(--line);padding:10px 12px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);outline:none;transition:border-color .2s;}
-.add-inp:focus{border-color:var(--text);}
-.add-inp::placeholder{color:var(--done);}
-.add-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--surface);background:var(--text);border:none;padding:10px 16px;cursor:pointer;white-space:nowrap;}
-.btns{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap;}
-.btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:none;border:1px solid var(--line);padding:9px 14px;cursor:pointer;transition:all .2s;}
-.btn:hover{color:var(--text);border-color:var(--text);}
-.btn-red{color:#c0392b;border-color:#e8c8c2;}
-.btn-red:hover{border-color:#c0392b;}
-.save-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:10px;text-align:right;min-height:14px;}
-.reset-row{display:none;font-family:'DM Mono',monospace;font-size:11px;margin-top:12px;gap:12px;align-items:center;}
-.reset-row.show{display:flex;}
-.cfm{cursor:pointer;text-decoration:underline;}
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap');
 
-/* CHART — Japanese candles */
-.chart-empty{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);padding:48px 0;text-align:center;border:1px dashed var(--line);}
-.candles-outer{position:relative;margin-bottom:24px;}
-.candles-wrap{display:flex;align-items:flex-end;gap:3px;padding-bottom:28px;border-bottom:1px solid var(--line);position:relative;}
-.c-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;min-width:0;}
-.c-wick{width:1px;background:var(--done);position:absolute;bottom:0;}
-.c-body{width:40%;max-width:12px;min-height:4px;position:absolute;bottom:0;border-radius:1px;}
-.c-pct{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);position:absolute;white-space:nowrap;text-align:center;width:100%;}
-.c-date{position:absolute;bottom:-22px;font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);white-space:nowrap;text-align:center;width:100%;}
-.avg-line{position:absolute;left:0;right:0;height:1px;background:var(--done);pointer-events:none;}
-.avg-label{position:absolute;right:0;font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);}
-
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:16px;}
-.stat-cell{background:var(--surface);padding:14px;text-align:center;}
-.stat-n{font-family:'DM Mono',monospace;font-size:20px;font-weight:300;display:block;}
-.stat-l{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-top:3px;}
-
-.lb-ttl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
-.lb-tbl{width:100%;border-collapse:collapse;}
-.lb-tbl th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 0;border-bottom:1px solid var(--line);font-weight:400;}
-.lb-tbl th:last-child,.lb-tbl td:last-child{text-align:right;}
-.lb-tbl td{font-family:'DM Mono',monospace;font-size:12px;padding:10px 0;border-bottom:1px solid var(--line);}
-.lb-tbl tr:last-child td{border-bottom:none;}
-.lb-tbl tr.me td{font-weight:500;}
-.lb-rank{color:var(--muted);font-size:10px;}
-.lb-you{font-size:9px;color:var(--muted);margin-left:6px;}
-.lb-bar{display:inline-block;height:2px;background:var(--done);vertical-align:middle;margin-right:8px;}
-.lb-bar.me{background:var(--text);}
-.hash-sec{margin-top:32px;padding-top:24px;border-top:1px solid var(--line);}
-.hash-sec-ttl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
-.hash-desc{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:16px;line-height:1.7;}
-.hash-box{background:var(--surface);border:1px solid var(--line);padding:16px;margin-bottom:12px;cursor:pointer;transition:border-color .2s;display:none;}
-.hash-box:hover{border-color:var(--text);}
-.hash-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--text);word-break:break-all;letter-spacing:.03em;line-height:1.7;user-select:all;}
-.hash-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:8px;}
-.hash-copied{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;min-height:14px;}
-.hash-item{padding:14px 0;border-bottom:1px solid var(--line);}
-.hash-item:last-child{border-bottom:none;}
-.hash-item-val{font-family:'DM Mono',monospace;font-size:10px;word-break:break-all;line-height:1.6;}
-.hash-item-meta{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:4px;}
-.hash-item-btns{display:flex;gap:8px;margin-top:8px;}
-.h-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;background:none;border:1px solid var(--line);padding:5px 10px;cursor:pointer;color:var(--muted);transition:all .2s;}
-.h-btn:hover{color:var(--text);border-color:var(--text);}
-.h-btn-red{color:#c0392b;border-color:#e8c8c2;}
-.h-btn-red:hover{border-color:#c0392b;}
-.h-status{font-size:9px;color:var(--muted);}
-.h-status.used{color:#27ae60;}
-.h-status.revoked{color:#c0392b;}
-.prof-sec{margin-top:32px;padding-top:24px;border-top:1px solid var(--line);}
-.prof-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);}
-.prof-row:last-child{border-bottom:none;}
-.prof-key{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
-.prof-val{font-family:'DM Mono',monospace;font-size:12px;}
-.note{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-top:12px;line-height:1.6;}
-.loading{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:center;padding:40px 0;}
-
-@media(max-width:480px){
-  .screen{padding:28px 16px 72px;}
-  .ob-title{font-size:26px;}
-  .node-num{font-size:36px;}
-  .date-txt{font-size:20px;}
-  .nav-btn{font-size:10px;margin-right:16px;}
-  .task-title{font-size:13px;}
-  .add-row{flex-wrap:wrap;}
-  .add-btn{width:100%;}
-  .btns{gap:8px;}
-  .btn{font-size:9px;padding:8px 10px;}
-  .stat-n{font-size:16px;}
-}
-@media(max-width:360px){
-  .screen{padding:20px 14px 64px;}
-  .ob-title{font-size:22px;}
-  .node-num{font-size:30px;}
-  .date-txt{font-size:18px;}
-  .nav-btn{font-size:9px;margin-right:12px;}
-}
-@supports(padding:max(0px)){
-  .screen{
-    padding-left:max(16px,env(safe-area-inset-left));
-    padding-right:max(16px,env(safe-area-inset-right));
-    padding-bottom:max(72px,calc(env(safe-area-inset-bottom)+60px));
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --text: #1a1a18;
+    --muted: #8a8a85;
+    --accent: #1a1a18;
+    --done: #c8c8c2;
+    --line: #e8e8e2;
+    --green: #2d6a4f;
   }
-}
-@media(hover:none) and (pointer:coarse){
-  .task-chk{width:20px;height:20px;}
-  .task-del{font-size:20px;padding:0 8px;}
-  .nav-btn{padding:14px 0;}
-  .btn{padding:11px 16px;}
-}
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .app {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  .header {
+    margin-bottom: 48px;
+  }
+
+  .logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .date-display {
+    font-family: 'DM Mono', monospace;
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+    position: relative;
+  }
+
+  .progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: var(--text);
+    transition: width 0.4s ease;
+  }
+
+  .progress-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  .nav {
+    display: flex;
+    gap: 0;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: none;
+    padding: 12px 0;
+    margin-right: 28px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+  }
+
+  .nav-btn.active {
+    color: var(--text);
+  }
+
+  .nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--text);
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    margin-top: 32px;
+  }
+
+  .section-label:first-child { margin-top: 0; }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .task:last-child { border-bottom: none; }
+
+  .task:hover .task-check { border-color: var(--text); }
+
+  .task.done { opacity: 0.38; }
+
+  .task-check {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--done);
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .task.done .task-check {
+    background: var(--text);
+    border-color: var(--text);
+  }
+
+  .task.done .task-check::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 1px;
+    width: 8px;
+    height: 5px;
+    border-left: 1px solid white;
+    border-bottom: 1px solid white;
+    transform: rotate(-45deg);
+  }
+
+  .task-body { flex: 1; }
+
+  .task-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .task-title {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .task.done .task-title { text-decoration: line-through; color: var(--muted); }
+
+  .task-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--line);
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn:hover { color: var(--text); border-color: var(--text); }
+
+  .chart-section { padding-top: 8px; }
+
+  .chart-empty {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 40px 0;
+    text-align: center;
+    border: 1px dashed var(--line);
+  }
+
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 120px;
+    padding-bottom: 24px;
+    position: relative;
+  }
+
+  .chart-bars::after {
+    content: '';
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .bar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .bar-pct-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+  }
+
+  .bar-fill {
+    width: 100%;
+    background: var(--text);
+    transition: height 0.4s ease;
+    min-height: 2px;
+  }
+
+  .bar-date-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    height: 24px;
+    position: absolute;
+    bottom: 0;
+  }
+
+  .bar-col-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    height: 100%;
+  }
+
+  .chart-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    margin-top: 24px;
+    border: 1px solid var(--line);
+  }
+
+  .stat-cell {
+    background: var(--surface);
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-n {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--text);
+    display: block;
+  }
+
+  .stat-l {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-top: 4px;
+  }
+
+  .save-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 12px;
+    text-align: right;
+    min-height: 14px;
+  }
+
+  .reset-confirm {
+    display: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    margin-top: 12px;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .reset-confirm.show { display: flex; }
+  .confirm-btn { cursor: pointer; text-decoration: underline; }
+
+  @media (max-width: 480px) {
+    .app { padding: 32px 20px 60px; }
+    .date-display { font-size: 22px; }
+  }
 </style>
 </head>
 <body>
-
-<!-- ONBOARDING -->
-<div class="screen active" id="s-onboard">
-  <div class="ob-logo">Parashut</div>
-  <div class="ob-title">Ваш Node</div>
-  <div class="ob-desc">Кожен учасник отримує унікальний вузол мережі. Node 0 — засновник. Нові учасники входять тільки через хеш виданий діючим учасником.</div>
-  <div class="node-box">
-    <div class="node-lbl">Node</div>
-    <div class="node-num" id="ob-node">—</div>
-  </div>
-  <div class="f-lbl">Ваше ім'я</div>
-  <input class="f-inp" id="r-name" type="text" placeholder="Введіть ім'я" maxlength="32" autocomplete="off">
-  <div class="f-lbl">Пароль / хеш</div>
-  <input class="f-inp" id="r-pass" type="text" placeholder="Пароль або хеш від учасника" maxlength="128" autocomplete="off" spellcheck="false">
-  <button class="btn-reg" id="reg-btn" onclick="doRegister()">Увійти в мережу</button>
-  <div class="ob-err" id="r-err"></div>
-</div>
-
-<!-- MAIN -->
-<div class="screen" id="s-main">
-  <div class="hdr">
-    <div class="hdr-top">
-      <div>
-        <div class="logo">Parashut</div>
-        <div class="date-txt" id="h-date">—</div>
-      </div>
-      <div class="nbadge">
-        <div id="h-node">Node —</div>
-        <div id="h-name" style="margin-top:2px;"></div>
-      </div>
-    </div>
-    <div class="prog-row">
-      <div class="prog-track"><div class="prog-fill" id="prog-bar"></div></div>
-      <div class="prog-pct" id="prog-pct">0%</div>
+<div class="app">
+  <div class="header">
+    <div class="logo">Parashut</div>
+    <div class="date-display" id="date-display">—</div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="bar"></div></div>
+      <div class="progress-pct" id="pct">0%</div>
     </div>
   </div>
+
   <div class="nav">
-    <button class="nav-btn active" onclick="tab('plan')">План</button>
-    <button class="nav-btn" onclick="tab('chart')">Графік</button>
-    <button class="nav-btn" onclick="tab('nodes')">Nodes</button>
+    <button class="nav-btn active" onclick="switchTab('plan')">План</button>
+    <button class="nav-btn" onclick="switchTab('chart')">Графік</button>
   </div>
-  <div id="v-plan" class="view active">
-    <div id="tasks-wrap"></div>
-    <div class="add-row">
-      <input class="add-inp" id="q-title" type="text" placeholder="Нова задача..." maxlength="80" autocomplete="off">
-      <button class="add-btn" onclick="quickAdd()">+ Додати</button>
+
+  <div id="view-plan" class="view active">
+
+    <div class="section-label">Пік — найважче першим</div>
+
+    <div class="task" data-id="0" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">10:30 – 11:00</div>
+        <div class="task-title">Активація мозку</div>
+        <div class="task-tag">мозок</div>
+      </div>
     </div>
-    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-      <input class="add-inp" id="q-time" type="text" placeholder="Час (09:00–10:00)" maxlength="20" autocomplete="off" style="font-size:11px;min-width:140px;">
-      <input class="add-inp" id="q-tag" type="text" placeholder="Тег" maxlength="20" autocomplete="off" style="font-size:11px;min-width:80px;">
+
+    <div class="task" data-id="1" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">11:00 – 12:30</div>
+        <div class="task-title">Дослідження топових активів</div>
+        <div class="task-tag">фокус</div>
+      </div>
     </div>
-    <div class="btns">
+
+    <div class="task" data-id="2" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">12:30 – 13:30</div>
+        <div class="task-title">Розкидання кластерів</div>
+        <div class="task-tag">фокус</div>
+      </div>
+    </div>
+
+    <div class="section-label">Відновлення</div>
+
+    <div class="task" data-id="3" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">13:30 – 14:15</div>
+        <div class="task-title">Їжа + прогулянка без екрану</div>
+        <div class="task-tag">відновлення</div>
+      </div>
+    </div>
+
+    <div class="section-label">Розвиток</div>
+
+    <div class="task" data-id="4" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">14:15 – 15:15</div>
+        <div class="task-title">Читання — 1 година</div>
+        <div class="task-tag">мозок</div>
+      </div>
+    </div>
+
+    <div class="task" data-id="5" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">15:15 – 15:50</div>
+        <div class="task-title">Фізична активність</div>
+        <div class="task-tag">мозок + тіло</div>
+      </div>
+    </div>
+
+    <div class="section-label">Вечір</div>
+
+    <div class="task" data-id="6" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">16:00 – 17:00</div>
+        <div class="task-title">Моніторинг і виконання угод</div>
+        <div class="task-tag">трейдинг</div>
+      </div>
+    </div>
+
+    <div class="task" data-id="7" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">21:00 – 21:20</div>
+        <div class="task-title">Review дня</div>
+        <div class="task-tag">рефлексія</div>
+      </div>
+    </div>
+
+    <div class="actions">
       <button class="btn" onclick="saveDay()">Зберегти день</button>
       <button class="btn" onclick="showReset()">Новий день</button>
-      <button class="btn btn-red" onclick="clearTasks()">Очистити задачі</button>
     </div>
-    <div class="reset-row" id="reset-row">
+
+    <div class="reset-confirm" id="reset-confirm">
       <span>Скинути прогрес?</span>
-      <span class="cfm" onclick="doReset()">Так</span>
-      <span class="cfm" onclick="hideReset()">Ні</span>
+      <span class="confirm-btn" onclick="resetDay()">Так</span>
+      <span class="confirm-btn" onclick="hideReset()">Ні</span>
     </div>
+
     <div class="save-note" id="save-note"></div>
   </div>
-  <div id="v-chart" class="view">
-    <div id="chart-wrap"></div>
-    <div class="btns" style="margin-top:16px;">
-      <button class="btn btn-red" onclick="clearHistory()">Очистити графік</button>
+
+  <div id="view-chart" class="view">
+    <div class="chart-section">
+      <div id="chart-content"></div>
+      <div class="actions" style="margin-top:24px">
+        <button class="btn" onclick="clearHistory()">Очистити графік</button>
+      </div>
     </div>
-  </div>
-  <div id="v-nodes" class="view">
-    <div id="nodes-wrap"></div>
-    <div class="note">Таблиця оновлюється при збереженні дня.</div>
   </div>
 </div>
 
 <script>
-const SB_URL = 'https://maqxiowaiqemzjdogrwx.supabase.co';
-const SB_KEY = 'sb_publishable_kZGntPrD21oKS0fIdWCyOA_2LFYwXBe';
-
-async function sbFetch(path, method='GET', body=null, extra={}){
-  const opts = {
-    method,
-    headers:{
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer '+SB_KEY,
-      'Content-Type': 'application/json',
-      ...extra
-    }
-  };
-  if(body) opts.body = JSON.stringify(body);
-  const r = await fetch(SB_URL+path, opts);
-  if(!r.ok){ const e=await r.text(); throw new Error(e); }
-  const txt = await r.text();
-  return txt ? JSON.parse(txt) : null;
-}
-
-const TODAY = new Date().toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});
+const TOTAL = 8;
+const TODAY = new Date().toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit', year:'numeric'});
 const TODAY_KEY = new Date().toISOString().slice(0,10);
-const MASTER = 'QwertyQ22$';
-const PROFILE_KEY = 'prs_profile_v2';
+const STORAGE_KEY = 'parashut_state_v1';
+const HISTORY_KEY = 'parashut_history_v1';
 
-const DEFAULT_TASKS = [
-  {id:'d0',sec:'Пік — найважче першим',time:'10:30–11:00',title:'Активація мозку',tag:'мозок',done:false},
-  {id:'d1',sec:'Пік — найважче першим',time:'11:00–12:30',title:'Дослідження топових активів',tag:'фокус',done:false},
-  {id:'d2',sec:'Пік — найважче першим',time:'12:30–13:30',title:'Розкидання кластерів',tag:'фокус',done:false},
-  {id:'d3',sec:'Відновлення',time:'13:30–14:15',title:'Їжа + прогулянка без екрану',tag:'відновлення',done:false},
-  {id:'d4',sec:'Розвиток',time:'14:15–15:15',title:'Читання — 1 година',tag:'мозок',done:false},
-  {id:'d5',sec:'Розвиток',time:'15:15–15:50',title:'Фізична активність',tag:'мозок + тіло',done:false},
-  {id:'d6',sec:'Вечір',time:'16:00–17:00',title:'Моніторинг і виконання угод',tag:'трейдинг',done:false},
-  {id:'d7',sec:'Вечір',time:'21:00–21:20',title:'Review дня',tag:'рефлексія',done:false},
-];
-
-function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY));}catch(e){return null;}}
-function setProfile(p){localStorage.setItem(PROFILE_KEY,JSON.stringify(p));}
-
-async function sha256(str){
-  const buf = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+function getState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { return {}; }
 }
+function setState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch(e) { return []; }
+}
+function setHistory(h) { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); }
 
-async function doRegister(){
-  const name=document.getElementById('r-name').value.trim();
-  const pass=document.getElementById('r-pass').value.trim();
-  const err=document.getElementById('r-err');
-  const btn=document.getElementById('reg-btn');
-  err.textContent='';
-  if(!name){err.textContent='Введіть ім\'я';return;}
-  if(!pass){err.textContent='Введіть пароль або хеш';return;}
-  btn.disabled=true; btn.textContent='Підключення...';
-  try{
-    if(pass===MASTER){
-      const existing=await sbFetch('/rest/v1/nodes?node_number=eq.0&select=node_number');
-      if(existing&&existing.length>0){err.textContent='Node 0 вже зайнятий';btn.disabled=false;btn.textContent='Увійти в мережу';return;}
-      await sbFetch('/rest/v1/nodes','POST',{node_number:0,name,joined_at:TODAY_KEY,invited_by:null,avg_eff:0,days:0},{'Prefer':'return=representation'});
-      const p={node:0,name,joinedAt:TODAY_KEY,invitedBy:null};
-      setProfile(p); startApp(p); return;
-    }
-    const hashes=await sbFetch('/rest/v1/hashes?hash=eq.'+encodeURIComponent(pass)+'&select=*');
-    if(!hashes||!hashes.length||hashes[0].used_by||hashes[0].revoked){
-      err.textContent='Невірний пароль або хеш вже використано / деактивовано';
-      btn.disabled=false; btn.textContent='Увійти в мережу'; return;
-    }
-    const hashEntry=hashes[0];
-    const allNodes=await sbFetch('/rest/v1/nodes?select=node_number&order=node_number.desc&limit=1');
-    const nextNode=allNodes&&allNodes.length>0?allNodes[0].node_number+1:1;
-    await sbFetch('/rest/v1/nodes','POST',{node_number:nextNode,name,joined_at:TODAY_KEY,invited_by:hashEntry.issued_by,avg_eff:0,days:0},{'Prefer':'return=representation'});
-    await sbFetch('/rest/v1/hashes?id=eq.'+hashEntry.id,'PATCH',{used_by:name,used_node:nextNode,used_at:TODAY_KEY});
-    const p={node:nextNode,name,joinedAt:TODAY_KEY,invitedBy:hashEntry.issued_by};
-    setProfile(p); startApp(p);
-  }catch(e){
-    err.textContent='Помилка: '+e.message;
-    btn.disabled=false; btn.textContent='Увійти в мережу';
+function loadState() {
+  const s = getState();
+  if (s.date === TODAY_KEY && s.done) {
+    s.done.forEach(id => {
+      const el = document.querySelector('[data-id="'+id+'"]');
+      if (el) el.classList.add('done');
+    });
   }
+  document.getElementById('date-display').textContent = TODAY;
+  update();
 }
 
-function startApp(p){
-  document.getElementById('s-onboard').classList.remove('active');
-  document.getElementById('s-main').classList.add('active');
-  document.getElementById('h-date').textContent=TODAY;
-  document.getElementById('h-node').innerHTML='<strong>Node '+p.node+'</strong>';
-  document.getElementById('h-name').textContent=p.name;
-  loadTasks();
-  document.getElementById('q-title').addEventListener('keydown',e=>{if(e.key==='Enter')quickAdd();});
+function getDone() {
+  return [...document.querySelectorAll('.task.done')].map(el => el.dataset.id);
 }
 
-async function boot(){
-  const p=getProfile();
-  if(p){ startApp(p); }
-  else{
-    try{
-      const nodes=await sbFetch('/rest/v1/nodes?select=node_number');
-      document.getElementById('ob-node').textContent=nodes?nodes.length:0;
-    }catch(e){ document.getElementById('ob-node').textContent='?'; }
+function toggle(el) {
+  el.classList.toggle('done');
+  update();
+  const s = getState();
+  s.date = TODAY_KEY;
+  s.done = getDone();
+  setState(s);
+}
+
+function update() {
+  const done = document.querySelectorAll('.task.done').length;
+  const pct = Math.round(done / TOTAL * 100);
+  document.getElementById('bar').style.width = pct + '%';
+  document.getElementById('pct').textContent = pct + '%';
+}
+
+function saveDay() {
+  const done = document.querySelectorAll('.task.done').length;
+  const pct = Math.round(done / TOTAL * 100);
+  let h = getHistory();
+  const idx = h.findIndex(x => x.date === TODAY_KEY);
+  const entry = { date: TODAY_KEY, label: TODAY.slice(0,5), pct };
+  if (idx >= 0) h[idx] = entry;
+  else h.push(entry);
+  if (h.length > 30) h = h.slice(-30);
+  setHistory(h);
+  const note = document.getElementById('save-note');
+  note.textContent = 'збережено ' + new Date().toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'});
+  renderChart();
+}
+
+function showReset() { document.getElementById('reset-confirm').classList.add('show'); }
+function hideReset() { document.getElementById('reset-confirm').classList.remove('show'); }
+
+function resetDay() {
+  document.querySelectorAll('.task').forEach(el => el.classList.remove('done'));
+  update();
+  setState({ date: TODAY_KEY, done: [] });
+  document.getElementById('save-note').textContent = '';
+  hideReset();
+}
+
+function clearHistory() {
+  setHistory([]);
+  renderChart();
+}
+
+function renderChart() {
+  const h = getHistory();
+  const container = document.getElementById('chart-content');
+
+  if (!h.length) {
+    container.innerHTML = '<div class="chart-empty">Немає даних.<br>Завершіть день і натисніть "Зберегти день".</div>';
+    return;
   }
-}
 
-let localTasks=null;
+  const avg = Math.round(h.reduce((s, x) => s + x.pct, 0) / h.length);
+  const best = Math.max(...h.map(x => x.pct));
+  const days = h.length;
+  const maxH = 96;
 
-async function loadTasks(){
-  const p=getProfile();
-  const wrap=document.getElementById('tasks-wrap');
-  wrap.innerHTML='<div class="loading">Завантаження...</div>';
-  try{
-    const dbTasks=await sbFetch('/rest/v1/tasks?node_number=eq.'+p.node+'&date=eq.'+TODAY_KEY+'&select=*&order=id.asc');
-    if(dbTasks&&dbTasks.length>0){
-      localTasks=dbTasks.map(t=>({id:t.task_id,sec:t.section||'',time:t.time_slot||'',title:t.title,tag:t.tag||'',done:t.done,dbId:t.id}));
-    } else {
-      localTasks=JSON.parse(JSON.stringify(DEFAULT_TASKS));
-      await saveTasksToDB(localTasks);
-    }
-  }catch(e){ localTasks=JSON.parse(JSON.stringify(DEFAULT_TASKS)); }
-  renderTasks();
-}
-
-async function saveTasksToDB(tasks){
-  const p=getProfile();
-  try{
-    await sbFetch('/rest/v1/tasks?node_number=eq.'+p.node+'&date=eq.'+TODAY_KEY,'DELETE');
-    const rows=tasks.map(t=>({node_number:p.node,task_id:t.id,section:t.sec||null,time_slot:t.time||null,title:t.title,tag:t.tag||null,done:t.done,date:TODAY_KEY}));
-    if(rows.length>0) await sbFetch('/rest/v1/tasks','POST',rows,{'Prefer':'return=representation'});
-  }catch(e){console.error('saveTasksToDB',e);}
-}
-
-async function updateTaskDone(taskId,done){
-  const p=getProfile();
-  try{ await sbFetch('/rest/v1/tasks?node_number=eq.'+p.node+'&task_id=eq.'+encodeURIComponent(taskId)+'&date=eq.'+TODAY_KEY,'PATCH',{done}); }
-  catch(e){console.error('updateTaskDone',e);}
-}
-
-function renderTasks(){
-  const tasks=localTasks||[];
-  const wrap=document.getElementById('tasks-wrap');
-  if(!tasks.length){
-    wrap.innerHTML='<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--muted);padding:24px 0;text-align:center;border:1px dashed var(--line)">Список порожній. Додайте задачі нижче.</div>';
-    updateProg(tasks); return;
-  }
-  const secs={},noSec=[];
-  tasks.forEach(t=>{ if(t.sec){if(!secs[t.sec])secs[t.sec]=[];secs[t.sec].push(t);}else noSec.push(t); });
-  let html='';
-  Object.keys(secs).forEach(s=>{ html+=`<div class="sec-lbl">${s}</div>`; secs[s].forEach(t=>{html+=taskHtml(t);}); });
-  if(noSec.length){ html+=`<div class="sec-lbl">Додаткові</div>`; noSec.forEach(t=>{html+=taskHtml(t);}); }
-  wrap.innerHTML=html;
-  updateProg(tasks);
-}
-
-function taskHtml(t){
-  return `<div class="task${t.done?' done':''}" id="t-${t.id}">
-    <div class="task-chk" onclick="toggleTask('${t.id}')"></div>
-    <div class="task-body">
-      ${t.time?`<div class="task-time">${t.time}</div>`:''}
-      <div class="task-title">${esc(t.title)}</div>
-      ${t.tag?`<div class="task-tag">${esc(t.tag)}</div>`:''}
-    </div>
-    <button class="task-del" onclick="delTask('${t.id}')">×</button>
-  </div>`;
-}
-
-function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-async function toggleTask(id){
-  const t=localTasks.find(x=>x.id===id);
-  if(!t)return;
-  t.done=!t.done;
-  renderTasks();
-  await updateTaskDone(id,t.done);
-}
-
-async function delTask(id){
-  const p=getProfile();
-  localTasks=localTasks.filter(t=>t.id!==id);
-  renderTasks();
-  try{ await sbFetch('/rest/v1/tasks?node_number=eq.'+p.node+'&task_id=eq.'+encodeURIComponent(id)+'&date=eq.'+TODAY_KEY,'DELETE'); }
-  catch(e){console.error('delTask',e);}
-}
-
-async function quickAdd(){
-  const titleEl=document.getElementById('q-title');
-  const timeEl=document.getElementById('q-time');
-  const tagEl=document.getElementById('q-tag');
-  const title=titleEl.value.trim();
-  if(!title)return;
-  const p=getProfile();
-  const newTask={id:'c'+Date.now(),sec:'',time:timeEl.value.trim(),title,tag:tagEl.value.trim(),done:false};
-  localTasks.push(newTask);
-  titleEl.value=''; timeEl.value=''; tagEl.value='';
-  renderTasks(); titleEl.focus();
-  try{
-    await sbFetch('/rest/v1/tasks','POST',{node_number:p.node,task_id:newTask.id,section:null,time_slot:newTask.time||null,title:newTask.title,tag:newTask.tag||null,done:false,date:TODAY_KEY},{'Prefer':'return=representation'});
-  }catch(e){console.error('quickAdd',e);}
-}
-
-async function clearTasks(){
-  if(!confirm('Видалити всі задачі і скинути до стандартних?'))return;
-  const p=getProfile();
-  try{ await sbFetch('/rest/v1/tasks?node_number=eq.'+p.node+'&date=eq.'+TODAY_KEY,'DELETE'); }catch(e){}
-  localTasks=JSON.parse(JSON.stringify(DEFAULT_TASKS));
-  await saveTasksToDB(localTasks);
-  renderTasks();
-}
-
-function updateProg(tasks){
-  const total=tasks.length;
-  const done=tasks.filter(t=>t.done).length;
-  const pct=total?Math.round(done/total*100):0;
-  document.getElementById('prog-bar').style.width=pct+'%';
-  document.getElementById('prog-pct').textContent=pct+'%';
-}
-
-// SAVE DAY — записує результат і скидає задачі
-async function saveDay(){
-  const tasks=localTasks||[];
-  const total=tasks.length||1;
-  const done=tasks.filter(t=>t.done).length;
-  const pct=Math.round(done/total*100);
-  const p=getProfile();
-  const note=document.getElementById('save-note');
-  try{
-    // Кожне збереження = нова свічка
-    await sbFetch('/rest/v1/daily_stats','POST',{node_number:p.node,date:TODAY_KEY,pct},{'Prefer':'return=representation'});
-    // Оновити середнє
-    const stats=await sbFetch('/rest/v1/daily_stats?node_number=eq.'+p.node+'&select=pct');
-    const avg=stats?Math.round(stats.reduce((s,x)=>s+x.pct,0)/stats.length):pct;
-    await sbFetch('/rest/v1/nodes?node_number=eq.'+p.node,'PATCH',{avg_eff:avg,days:stats?stats.length:1});
-    // Видалити задачі і показати порожній список
-    await sbFetch('/rest/v1/tasks?node_number=eq.'+p.node+'&date=eq.'+TODAY_KEY,'DELETE');
-    localTasks=[];
-    renderTasks();
-    note.textContent='День збережено ✓';
-    setTimeout(()=>{note.textContent='';},3000);
-  }catch(e){
-    note.textContent='Помилка: '+e.message;
-    console.error('saveDay',e);
-  }
-}
-
-function showReset(){document.getElementById('reset-row').classList.add('show');}
-function hideReset(){document.getElementById('reset-row').classList.remove('show');}
-async function doReset(){
-  localTasks=localTasks.map(t=>({...t,done:false}));
-  const p=getProfile();
-  try{ await sbFetch('/rest/v1/tasks?node_number=eq.'+p.node+'&date=eq.'+TODAY_KEY,'PATCH',{done:false}); }catch(e){}
-  document.getElementById('save-note').textContent='';
-  hideReset(); renderTasks();
-}
-
-// CHART — японські свічки
-async function renderChart(){
-  const p=getProfile();
-  const wrap=document.getElementById('chart-wrap');
-  wrap.innerHTML='<div class="loading">Завантаження...</div>';
-  try{
-    const stats=await sbFetch('/rest/v1/daily_stats?node_number=eq.'+p.node+'&select=date,pct&order=date.asc');
-    if(!stats||!stats.length){
-      wrap.innerHTML='<div class="chart-empty">Немає даних.<br>Завершіть день і натисніть "Зберегти день".</div>';
-      return;
-    }
-    const recent=stats.slice(-20);
-    const avg=Math.round(stats.reduce((s,x)=>s+x.pct,0)/stats.length);
-    const best=Math.max(...stats.map(x=>x.pct));
-    const CH=120; // chart height px for 100%
-
-    const candles=recent.map(x=>{
-      const h=Math.max(Math.round((x.pct/100)*CH),4);
-      const isUp=x.pct>=avg;
-      const color=isUp?'#2d6a4f':'#1a1a18';
-      const lbl=x.date.slice(5).replace('-','.');
-      return `<div class="c-col" style="height:${CH+20}px">
-        <div class="c-wick" style="height:${h+4}px;bottom:0;"></div>
-        <div class="c-body" style="height:${h}px;bottom:0;background:${color};"></div>
-        <div class="c-pct" style="bottom:${h+6}px;">${x.pct}%</div>
-        <div class="c-date">${lbl}</div>
-      </div>`;
-    }).join('');
-
-    const avgPx=Math.round((avg/100)*CH);
-
-    wrap.innerHTML=`
-      <div class="candles-outer">
-        <div class="candles-wrap" style="height:${CH+52}px;align-items:flex-end;">
-          ${candles}
-          <div class="avg-line" style="bottom:${avgPx+28}px;"></div>
-          <div class="avg-label" style="bottom:${avgPx+30}px;">avg ${avg}%</div>
-        </div>
+  const bars = h.map(x => {
+    const h = Math.max(Math.round((x.pct / 100) * maxH), 2);
+    return `<div class="bar-col-wrap">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;justify-content:flex-end;padding-bottom:28px;">
+        <div class="bar-pct-label">${x.pct}%</div>
+        <div class="bar-fill" style="height:${h}px"></div>
       </div>
-      <div class="stats-grid">
-        <div class="stat-cell"><span class="stat-n">${avg}%</span><span class="stat-l">Середнє</span></div>
-        <div class="stat-cell"><span class="stat-n">${best}%</span><span class="stat-l">Найкраще</span></div>
-        <div class="stat-cell"><span class="stat-n">${stats.length}</span><span class="stat-l">Днів</span></div>
-      </div>
-      <div style="display:flex;gap:16px;margin-top:8px;">
-        <div style="display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);">
-          <div style="width:10px;height:10px;background:#2d6a4f;border-radius:1px;flex-shrink:0;"></div>вище середнього
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);">
-          <div style="width:10px;height:10px;background:#1a1a18;border-radius:1px;flex-shrink:0;"></div>нижче середнього
-        </div>
-      </div>`;
-  }catch(e){
-    wrap.innerHTML='<div class="chart-empty">Помилка завантаження</div>';
-  }
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:center;position:absolute;bottom:0;width:100%">${x.label}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="chart-bars" style="display:flex;align-items:flex-end;gap:6px;height:${maxH+28}px;position:relative;">${bars}</div>
+    <div class="chart-stats">
+      <div class="stat-cell"><span class="stat-n">${avg}%</span><span class="stat-l">Середнє</span></div>
+      <div class="stat-cell"><span class="stat-n">${best}%</span><span class="stat-l">Найкраще</span></div>
+      <div class="stat-cell"><span class="stat-n">${days}</span><span class="stat-l">Днів</span></div>
+    </div>`;
 }
 
-async function clearHistory(){
-  if(!confirm('Видалити всю статистику?'))return;
-  const p=getProfile();
-  try{
-    await sbFetch('/rest/v1/rpc/delete_user_stats','POST',{p_node:p.node});
-    await sbFetch('/rest/v1/nodes?node_number=eq.'+p.node,'PATCH',{avg_eff:0,days:0});
-    renderChart();
-  }catch(e){console.error('clearHistory',e);}
-}
-
-// NODES
-let lastGenHash='';
-
-async function renderNodes(){
-  const p=getProfile();
-  const wrap=document.getElementById('nodes-wrap');
-  wrap.innerHTML='<div class="loading">Завантаження...</div>';
-  try{
-    const nodes=await sbFetch('/rest/v1/nodes?select=*&order=avg_eff.desc&limit=10');
-    const hashes=await sbFetch('/rest/v1/hashes?issued_by=eq.'+p.node+'&select=*&order=created_at.desc');
-
-    const rows=(nodes||[]).map((n,i)=>{
-      const isMe=n.node_number===p.node;
-      const bw=Math.round((n.avg_eff||0)*0.6);
-      const inv=n.invited_by!=null?'← Node '+n.invited_by:'засновник';
-      return `<tr class="${isMe?'me':''}">
-        <td><span class="lb-rank">${i+1}</span></td>
-        <td>
-          <div style="display:flex;align-items:center;gap:6px">
-            <div class="lb-bar${isMe?' me':''}" style="width:${bw}px"></div>
-            Node ${n.node_number}${isMe?'<span class="lb-you">(ви)</span>':''}
-          </div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px">${n.name} <span style="opacity:.5">${inv}</span></div>
-        </td>
-        <td>${n.avg_eff||0}%</td>
-        <td style="color:var(--muted)">${n.days||0}д</td>
-      </tr>`;
-    }).join('');
-
-    const hashItems=(hashes||[]).map(h=>{
-      const inactive=h.used_by||h.revoked;
-      return `<div class="hash-item">
-        <div class="hash-item-val" style="color:${inactive?'var(--done)':'var(--text)'};${inactive?'opacity:.6':''}">${h.hash}</div>
-        <div class="hash-item-meta">${h.created_at.slice(0,10)}${h.revoked?' · деактивовано':''}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
-          <div class="hash-item-btns">
-            ${!inactive?`
-              <button class="h-btn" onclick="copyHashItem('${h.hash}',this)">Копіювати</button>
-              <button class="h-btn h-btn-red" onclick="revokeHash(${h.id})">Деактивувати</button>
-            `:''}
-          </div>
-          <div class="h-status${h.used_by?' used':h.revoked?' revoked':''}">
-            ${h.used_by?'✓ '+h.used_by+' (Node '+h.used_node+')':h.revoked?'відкликано':'очікує'}
-          </div>
-        </div>
-      </div>`;
-    }).join('')||'<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:var(--muted);padding:12px 0">Ще не згенеровано жодного хешу</div>';
-
-    wrap.innerHTML=`
-      <div class="lb-ttl">Топ 10 Nodes — середня ефективність</div>
-      <table class="lb-tbl">
-        <thead><tr><th style="width:28px">#</th><th>Node</th><th>Eff</th><th>Днів</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-      <div class="hash-sec">
-        <div class="hash-sec-ttl">Генератор хешів</div>
-        <div class="hash-desc">Згенеруйте SHA-256 хеш і передайте новому учаснику. Кожен хеш одноразовий.</div>
-        <div class="hash-box" id="hash-box" onclick="copyLastHash()">
-          <div class="hash-val" id="hash-val"></div>
-          <div class="hash-meta" id="hash-meta"></div>
-        </div>
-        <div class="hash-copied" id="hash-copied"></div>
-        <div class="btns" style="margin-bottom:24px;">
-          <button class="btn" onclick="genHash()">Генерувати хеш</button>
-        </div>
-        <div class="hash-sec-ttl">Видані хеші (${(hashes||[]).length})</div>
-        ${hashItems}
-      </div>
-      <div class="prof-sec">
-        <div class="hash-sec-ttl">Ваш профіль</div>
-        <div class="prof-row"><span class="prof-key">Node</span><span class="prof-val">${p.node}</span></div>
-        <div class="prof-row"><span class="prof-key">Ім'я</span><span class="prof-val">${p.name}</span></div>
-        <div class="prof-row"><span class="prof-key">Приєднався</span><span class="prof-val">${p.joinedAt}</span></div>
-        <div class="prof-row"><span class="prof-key">Запрошений</span><span class="prof-val">${p.invitedBy!=null?'Node '+p.invitedBy:'засновник'}</span></div>
-      </div>`;
-  }catch(e){
-    wrap.innerHTML='<div class="loading">Помилка завантаження</div>';
-  }
-}
-
-async function genHash(){
-  const p=getProfile();
-  const hash=await sha256('prs'+p.node+p.name+Date.now()+Math.random());
-  lastGenHash=hash;
-  try{
-    await sbFetch('/rest/v1/hashes','POST',{hash,issued_by:p.node,revoked:false},{'Prefer':'return=representation'});
-    const box=document.getElementById('hash-box');
-    if(box){
-      box.style.display='block';
-      document.getElementById('hash-val').textContent=hash;
-      document.getElementById('hash-meta').textContent='SHA-256 · Node '+p.node+' · '+TODAY_KEY+' · натисніть щоб скопіювати';
-      document.getElementById('hash-copied').textContent='';
-    }
-    renderNodes();
-  }catch(e){alert('Помилка генерації хешу');}
-}
-
-function copyLastHash(){
-  if(!lastGenHash)return;
-  navigator.clipboard.writeText(lastGenHash).then(()=>{
-    const el=document.getElementById('hash-copied');
-    if(el){el.textContent='✓ скопійовано';setTimeout(()=>{el.textContent='';},2000);}
+function switchTab(name) {
+  document.querySelectorAll('.nav-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['plan','chart'][i] === name);
   });
-}
-
-function copyHashItem(hash,btn){
-  navigator.clipboard.writeText(hash).then(()=>{
-    const orig=btn.textContent;
-    btn.textContent='✓ скопійовано';
-    setTimeout(()=>{btn.textContent=orig;},2000);
-  }).catch(()=>{
-    const el=btn.closest('.hash-item').querySelector('.hash-item-val');
-    if(el){const r=document.createRange();r.selectNodeContents(el);window.getSelection().removeAllRanges();window.getSelection().addRange(r);}
+  document.querySelectorAll('.view').forEach(v => {
+    v.classList.toggle('active', v.id === 'view-' + name);
   });
+  if (name === 'chart') renderChart();
 }
 
-async function revokeHash(id){
-  if(!confirm('Деактивувати цей хеш?'))return;
-  try{
-    await sbFetch('/rest/v1/hashes?id=eq.'+id,'PATCH',{revoked:true,revoked_at:TODAY_KEY});
-    renderNodes();
-  }catch(e){alert('Помилка');}
-}
-
-function tab(name){
-  document.querySelectorAll('.nav-btn').forEach((b,i)=>{b.classList.toggle('active',['plan','chart','nodes'][i]===name);});
-  document.querySelectorAll('.view').forEach(v=>{v.classList.toggle('active',v.id==='v-'+name);});
-  if(name==='chart')renderChart();
-  if(name==='nodes')renderNodes();
-}
-
-boot();
+loadState();
 </script>
 </body>
 </html>
