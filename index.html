@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parashut</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --text: #1a1a18;
+    --muted: #8a8a85;
+    --accent: #1a1a18;
+    --done: #c8c8c2;
+    --line: #e8e8e2;
+    --green: #2d6a4f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .app {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  .header {
+    margin-bottom: 48px;
+  }
+
+  .logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .date-display {
+    font-family: 'DM Mono', monospace;
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+    position: relative;
+  }
+
+  .progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: var(--text);
+    transition: width 0.4s ease;
+  }
+
+  .progress-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  .nav {
+    display: flex;
+    gap: 0;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: none;
+    padding: 12px 0;
+    margin-right: 28px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+  }
+
+  .nav-btn.active {
+    color: var(--text);
+  }
+
+  .nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--text);
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    margin-top: 32px;
+  }
+
+  .section-label:first-child { margin-top: 0; }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .task:last-child { border-bottom: none; }
+
+  .task:hover .task-check { border-color: var(--text); }
+
+  .task.done { opacity: 0.38; }
+
+  .task-check {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--done);
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .task.done .task-check {
+    background: var(--text);
+    border-color: var(--text);
+  }
+
+  .task.done .task-check::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 1px;
+    width: 8px;
+    height: 5px;
+    border-left: 1px solid white;
+    border-bottom: 1px solid white;
+    transform: rotate(-45deg);
+  }
+
+  .task-body { flex: 1; }
+
+  .task-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .task-title {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .task.done .task-title { text-decoration: line-through; color: var(--muted); }
+
+  .task-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--line);
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn:hover { color: var(--text); border-color: var(--text); }
+
+  .chart-section { padding-top: 8px; }
+
+  .chart-empty {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 40px 0;
+    text-align: center;
+    border: 1px dashed var(--line);
+  }
+
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 120px;
+    padding-bottom: 24px;
+    position: relative;
+  }
+
+  .chart-bars::after {
+    content: '';
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .bar-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .bar-pct-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+  }
+
+  .bar-fill {
+    width: 100%;
+    background: var(--text);
+    transition: height 0.4s ease;
+    min-height: 2px;
+  }
+
+  .bar-date-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    height: 24px;
+    position: absolute;
+    bottom: 0;
+  }
+
+  .bar-col-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    height: 100%;
+  }
+
+  .chart-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    margin-top: 24px;
+    border: 1px solid var(--line);
+  }
+
+  .stat-cell {
+    background: var(--surface);
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-n {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--text);
+    display: block;
+  }
+
+  .stat-l {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-top: 4px;
+  }
+
+  .save-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 12px;
+    text-align: right;
+    min-height: 14px;
+  }
+
+  .reset-confirm {
+    display: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    margin-top: 12px;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .reset-confirm.show { display: flex; }
+  .confirm-btn { cursor: pointer; text-decoration: underline; }
+
+  @media (max-width: 480px) {
+    .app { padding: 32px 20px 60px; }
+    .date-display { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">Parashut</div>
+    <div class="date-display" id="date-display">—</div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="bar"></div></div>
+      <div class="progress-pct" id="pct">0%</div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="switchTab('plan')">План</button>
+    <button class="nav-btn" onclick="switchTab('chart')">Графік</button>
+  </div>
+
+  <div id="view-plan" class="view active">
+
+    <div class="section-label">Пік — найважче першим</div>
+
+    <div class="task" data-id="0" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">10:30 – 11:00</div>
+        <div class="task-title">Активація мозку</div>
+        <div class="task-tag">мозок</div>
+      </div>
+    </div>
+
+    <div class="task" data-id="1" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">11:00 – 12:30</div>
+        <div class="task-title">Дослідження топових активів</div>
+        <div class="task-tag">фокус</div>
+      </div>
+    </div>
+
+    <div class="task" data-id="2" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">12:30 – 13:30</div>
+        <div class="task-title">Розкидання кластерів</div>
+        <div class="task-tag">фокус</div>
+      </div>
+    </div>
+
+    <div class="section-label">Відновлення</div>
+
+    <div class="task" data-id="3" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">13:30 – 14:15</div>
+        <div class="task-title">Їжа + прогулянка без екрану</div>
+        <div class="task-tag">відновлення</div>
+      </div>
+    </div>
+
+    <div class="section-label">Розвиток</div>
+
+    <div class="task" data-id="4" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">14:15 – 15:15</div>
+        <div class="task-title">Читання — 1 година</div>
+        <div class="task-tag">мозок</div>
+      </div>
+    </div>
+
+    <div class="task" data-id="5" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">15:15 – 15:50</div>
+        <div class="task-title">Фізична активність</div>
+        <div class="task-tag">мозок + тіло</div>
+      </div>
+    </div>
+
+    <div class="section-label">Вечір</div>
+
+    <div class="task" data-id="6" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">16:00 – 17:00</div>
+        <div class="task-title">Моніторинг і виконання угод</div>
+        <div class="task-tag">трейдинг</div>
+      </div>
+    </div>
+
+    <div class="task" data-id="7" onclick="toggle(this)">
+      <div class="task-check"></div>
+      <div class="task-body">
+        <div class="task-time">21:00 – 21:20</div>
+        <div class="task-title">Review дня</div>
+        <div class="task-tag">рефлексія</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" onclick="saveDay()">Зберегти день</button>
+      <button class="btn" onclick="showReset()">Новий день</button>
+    </div>
+
+    <div class="reset-confirm" id="reset-confirm">
+      <span>Скинути прогрес?</span>
+      <span class="confirm-btn" onclick="resetDay()">Так</span>
+      <span class="confirm-btn" onclick="hideReset()">Ні</span>
+    </div>
+
+    <div class="save-note" id="save-note"></div>
+  </div>
+
+  <div id="view-chart" class="view">
+    <div class="chart-section">
+      <div id="chart-content"></div>
+      <div class="actions" style="margin-top:24px">
+        <button class="btn" onclick="clearHistory()">Очистити графік</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOTAL = 8;
+const TODAY = new Date().toLocaleDateString('uk-UA', {day:'2-digit', month:'2-digit', year:'numeric'});
+const TODAY_KEY = new Date().toISOString().slice(0,10);
+const STORAGE_KEY = 'parashut_state_v1';
+const HISTORY_KEY = 'parashut_history_v1';
+
+function getState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { return {}; }
+}
+function setState(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch(e) { return []; }
+}
+function setHistory(h) { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); }
+
+function loadState() {
+  const s = getState();
+  if (s.date === TODAY_KEY && s.done) {
+    s.done.forEach(id => {
+      const el = document.querySelector('[data-id="'+id+'"]');
+      if (el) el.classList.add('done');
+    });
+  }
+  document.getElementById('date-display').textContent = TODAY;
+  update();
+}
+
+function getDone() {
+  return [...document.querySelectorAll('.task.done')].map(el => el.dataset.id);
+}
+
+function toggle(el) {
+  el.classList.toggle('done');
+  update();
+  const s = getState();
+  s.date = TODAY_KEY;
+  s.done = getDone();
+  setState(s);
+}
+
+function update() {
+  const done = document.querySelectorAll('.task.done').length;
+  const pct = Math.round(done / TOTAL * 100);
+  document.getElementById('bar').style.width = pct + '%';
+  document.getElementById('pct').textContent = pct + '%';
+}
+
+function saveDay() {
+  const done = document.querySelectorAll('.task.done').length;
+  const pct = Math.round(done / TOTAL * 100);
+  let h = getHistory();
+  const idx = h.findIndex(x => x.date === TODAY_KEY);
+  const entry = { date: TODAY_KEY, label: TODAY.slice(0,5), pct };
+  if (idx >= 0) h[idx] = entry;
+  else h.push(entry);
+  if (h.length > 30) h = h.slice(-30);
+  setHistory(h);
+  const note = document.getElementById('save-note');
+  note.textContent = 'збережено ' + new Date().toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'});
+  renderChart();
+}
+
+function showReset() { document.getElementById('reset-confirm').classList.add('show'); }
+function hideReset() { document.getElementById('reset-confirm').classList.remove('show'); }
+
+function resetDay() {
+  document.querySelectorAll('.task').forEach(el => el.classList.remove('done'));
+  update();
+  setState({ date: TODAY_KEY, done: [] });
+  document.getElementById('save-note').textContent = '';
+  hideReset();
+}
+
+function clearHistory() {
+  setHistory([]);
+  renderChart();
+}
+
+function renderChart() {
+  const h = getHistory();
+  const container = document.getElementById('chart-content');
+
+  if (!h.length) {
+    container.innerHTML = '<div class="chart-empty">Немає даних.<br>Завершіть день і натисніть "Зберегти день".</div>';
+    return;
+  }
+
+  const avg = Math.round(h.reduce((s, x) => s + x.pct, 0) / h.length);
+  const best = Math.max(...h.map(x => x.pct));
+  const days = h.length;
+  const maxH = 96;
+
+  const bars = h.map(x => {
+    const h = Math.max(Math.round((x.pct / 100) * maxH), 2);
+    return `<div class="bar-col-wrap">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;justify-content:flex-end;padding-bottom:28px;">
+        <div class="bar-pct-label">${x.pct}%</div>
+        <div class="bar-fill" style="height:${h}px"></div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:center;position:absolute;bottom:0;width:100%">${x.label}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="chart-bars" style="display:flex;align-items:flex-end;gap:6px;height:${maxH+28}px;position:relative;">${bars}</div>
+    <div class="chart-stats">
+      <div class="stat-cell"><span class="stat-n">${avg}%</span><span class="stat-l">Середнє</span></div>
+      <div class="stat-cell"><span class="stat-n">${best}%</span><span class="stat-l">Найкраще</span></div>
+      <div class="stat-cell"><span class="stat-n">${days}</span><span class="stat-l">Днів</span></div>
+    </div>`;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.nav-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['plan','chart'][i] === name);
+  });
+  document.querySelectorAll('.view').forEach(v => {
+    v.classList.toggle('active', v.id === 'view-' + name);
+  });
+  if (name === 'chart') renderChart();
+}
+
+loadState();
+</script>
+</body>
+</html>
