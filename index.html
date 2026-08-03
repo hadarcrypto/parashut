@@ -491,15 +491,14 @@ async function loadTasks(){
       localTasks=cached;
       saveTasksToDB(localTasks);
     } else {
-      localTasks=JSON.parse(JSON.stringify(DEFAULT_TASKS));
-      await saveTasksToDB(localTasks);
-      saveTasksCache(p,localTasks);
+      // Новий день без жодної задачі — план стартує порожнім, без пресетів.
+      localTasks=[];
     }
   }catch(e){
     if(cached&&cached.length){
       localTasks=cached; // помилка запиту — лишаємось на останньому відомому локальному стані
     } else {
-      localTasks=JSON.parse(JSON.stringify(DEFAULT_TASKS));
+      localTasks=[];
     }
   }
   renderTasks();
@@ -586,11 +585,10 @@ async function quickAdd(){
 }
 
 async function clearTasks(){
-  if(!confirm('Видалити всі задачі і скинути до стандартних?'))return;
+  if(!confirm('Видалити всі задачі?'))return;
   const p=getProfile();
   try{ await sbFetch('/rest/v1/tasks?node_number=eq.'+p.node+'&date=eq.'+TODAY_KEY,'DELETE'); }catch(e){}
-  localTasks=JSON.parse(JSON.stringify(DEFAULT_TASKS));
-  await saveTasksToDB(localTasks);
+  localTasks=[];
   saveTasksCache(p,localTasks);
   renderTasks();
 }
